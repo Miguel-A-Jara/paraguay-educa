@@ -45,7 +45,7 @@ const Registro = () => {
       email: "",
       telefono: "",
       fechaNacimiento: "",
-      departamento: undefined, // undefined para que el select muestre el placeholder
+      departamento: "", // undefined para que el select muestre el placeholder
       password: "",
       confirmPassword: "",
     },
@@ -119,6 +119,7 @@ const Registro = () => {
                   render={({ field }) => (
                     <TextField
                       {...field}
+                      required
                       label="Nombre Completo"
                       fullWidth
                       error={!!errors.nombre}
@@ -139,6 +140,7 @@ const Registro = () => {
                   render={({ field }) => (
                     <TextField
                       {...field}
+                      required
                       label="Cédula (C.I.)"
                       placeholder="Ej: 1.234.567"
                       fullWidth
@@ -158,6 +160,7 @@ const Registro = () => {
                     <TextField
                       {...field}
                       type="date"
+                      required
                       label="Fecha de Nacimiento"
                       fullWidth
                       InputLabelProps={{ shrink: true }}
@@ -177,6 +180,7 @@ const Registro = () => {
                     <TextField
                       {...field}
                       select
+                      required
                       label="Departamento"
                       fullWidth
                       error={!!errors.departamento}
@@ -213,6 +217,7 @@ const Registro = () => {
                   render={({ field }) => (
                     <TextField
                       {...field}
+                      required
                       type="email"
                       label="Correo Electrónico"
                       fullWidth
@@ -231,6 +236,7 @@ const Registro = () => {
                   render={({ field }) => (
                     <TextField
                       {...field}
+                      required
                       label="Teléfono Móvil"
                       placeholder="09XX XXXXXX"
                       fullWidth
@@ -262,6 +268,7 @@ const Registro = () => {
                   render={({ field }) => (
                     <TextField
                       {...field}
+                      required
                       type={showPassword ? "text" : "password"}
                       label="Contraseña"
                       fullWidth
@@ -297,6 +304,7 @@ const Registro = () => {
                   render={({ field }) => (
                     <TextField
                       {...field}
+                      required
                       type={showPassword ? "text" : "password"}
                       label="Confirmar Contraseña"
                       fullWidth

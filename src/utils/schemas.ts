@@ -20,14 +20,20 @@ export const DEPARTAMENTOS = [
   "Presidente Hayes",
   "Boquerón",
   "Alto Paraguay",
-] as const; // 'as const' para que Zod lo acepte como literal
+] as const;
 
-// Regex Helpers
-// Formato CI: 1.234.567 (Con puntos opcionales o forzados, aquí forzamos puntos para el ejercicio)
+// 1. REGEX ACTUALIZADO PARA TELÉFONO
+// Explicación:
+// ^(?:\+595\s?|0)  -> Empieza con +595 (con espacio opcional) O empieza con 0
+// 9[6-9]\d         -> Sigue con 9, luego 6-9 (ej: 97, 98, 99), luego cualquier dígito (ej: 1) = Prefijo 971
+// \s?              -> Espacio opcional
+// \d{6}$           -> 6 dígitos finales
+const phoneRegex = /^(?:\+595\s?|0)9[6-9]\d\s?\d{6}$/;
+
+// 2. REGEX CI (Mantenemos el anterior que estaba bien, forzando puntos)
 const ciRegex = /^(?:\d{1,3}\.)?\d{3}\.\d{3}$/;
-// Formato Tel: 09XX XXXXXX o +595 9XX XXXXXX (simplificado)
-const phoneRegex = /^(\+595|0)9[6-9][1-6]\s\d{6}$/;
-// Password: 1 mayúscula, 1 minúscula, 1 número, 1 especial, min 8
+
+// 3. REGEX PASSWORD
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/;
 
@@ -46,20 +52,20 @@ export const registroSchema = z
     email: z
       .string()
       .min(1, "El correo es requerido")
-      .email("Formato de correo electrónico inválido"),
+      .email("Formato de correo electrónico inválido")
+      // VALIDACIÓN NUEVA: Debe terminar en .py
+      .refine((val) => val.endsWith(".py"), {
+        message: "El correo debe ser de un dominio paraguayo (.py)",
+      }),
 
     telefono: z
       .string()
       .min(1, "El teléfono es requerido")
-      .regex(
-        phoneRegex,
-        "Formato: 09XX XXXXXX o +595 9XX XXXXXX (incluya espacios)"
-      ),
+      .regex(phoneRegex, "Formato válido: +595 971 123456 o 0971 123456"),
 
     fechaNacimiento: z.string().refine((val) => {
       const date = new Date(val);
       const now = new Date();
-      // Calcular edad
       let age = now.getFullYear() - date.getFullYear();
       const m = now.getMonth() - date.getMonth();
       if (m < 0 || (m === 0 && now.getDate() < date.getDate())) {
@@ -68,9 +74,15 @@ export const registroSchema = z
       return age >= 13;
     }, "Debes ser mayor de 13 años para registrarte"),
 
-    departamento: z.enum(DEPARTAMENTOS, {
-      errorMap: () => ({ message: "Seleccione un departamento válido" }),
-    }),
+    departamento: z
+      .enum(DEPARTAMENTOS, {
+        error: () => ({ message: "Seleccione un departamento válido" }),
+      })
+      .or(
+        z
+          .literal("")
+          .refine((val) => val, { error: "Seleccione un departamento" })
+      ),
 
     password: z
       .string()
@@ -84,8 +96,7 @@ export const registroSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"], // El error aparecerá en este campo
+    path: ["confirmPassword"],
   });
 
-// Extraemos el tipo de TypeScript automáticamente del esquema
 export type RegistroFormType = z.infer<typeof registroSchema>;

@@ -1,14 +1,25 @@
-import React, { useState, type ReactNode } from "react";
+import React, { type ReactNode } from "react";
+import { useLocalStorage } from "usehooks-ts";
 import { AccessibilityContext } from "./AccessibilityContext";
 import type { ColorMode, FontSizeMode } from "../styles/theme";
 
 export const AccessibilityProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  // Estado inicial
-  const [colorMode, setColorMode] = useState<ColorMode>("normal");
-  const [fontSize, setFontSize] = useState<FontSizeMode>("normal");
-  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+  const [colorMode, setColorMode] = useLocalStorage<ColorMode>(
+    "paraguay-educa-theme",
+    "normal"
+  );
+
+  const [fontSize, setFontSize] = useLocalStorage<FontSizeMode>(
+    "paraguay-educa-fontsize",
+    "normal"
+  );
+
+  const [reducedMotion, setReducedMotion] = useLocalStorage<boolean>(
+    "paraguay-educa-motion",
+    false
+  );
 
   const toggleReducedMotion = () => setReducedMotion((prev) => !prev);
 
